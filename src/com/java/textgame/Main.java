@@ -35,7 +35,7 @@ public class Main {
 		System.out.println("뒤로 가기(4)");
 			
 		playerDoit = scan.nextLine();
-			
+		//
 		// 잘못된 알파벳 입력 시 반복하기
 		while(playerDoit.charAt(0) != '1' && playerDoit.charAt(0) != '2' &&
 				playerDoit.charAt(0) != '3' && playerDoit.charAt(0) != '4')
