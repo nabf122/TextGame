@@ -1,7 +1,6 @@
 package com.java.textgame;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
@@ -18,14 +17,24 @@ public class Main {
 	public static int df;	// 방어력
 	public static int gold;	// 보유 골드
 	
+	// 몬스터 전투에 필요한 정보 가져오기
+	public static String monName;
+	public static int monMaxHp;
+	public static int monRealHp;
+	public static int monAd;
+	public static int monDf;
+	public static int giveXp;
+	public static int giveGold;
+	
 	public static String yn;
 	
 	static Scanner scan = new Scanner(System.in);
+	static Random random = new Random();
+	static PlayerStatus pstatus = new PlayerStatus();
 	
 	private static void fight() {
 		
 		BuildMonster monster = new BuildMonster();
-		BettleOfMonster bom = new BettleOfMonster();
 		
 		System.out.println();
 		System.out.println("어떤 던전을 입장할까요?\n-------");
@@ -35,7 +44,7 @@ public class Main {
 		System.out.println("뒤로 가기(4)");
 			
 		playerDoit = scan.nextLine();
-		//
+		
 		// 잘못된 알파벳 입력 시 반복하기
 		while(playerDoit.charAt(0) != '1' && playerDoit.charAt(0) != '2' &&
 				playerDoit.charAt(0) != '3' && playerDoit.charAt(0) != '4')
@@ -58,21 +67,159 @@ public class Main {
 			System.out.println("슬라임 평원에 입장하셨습니다.");
 			System.out.println("==========================");
 			
+			// 슬라임 생성
 			monster.BuildMonster(1);
-			bom.Bettle();
+			
+			// 플레이어 정보 가져오기
+			xp = pstatus.getXp();
+			maxHp = pstatus.getMaxHp();
+			crrHp = pstatus.getCrrHp();
+			ad = pstatus.getAd();
+			df = pstatus.getDf();
+			gold = pstatus.getGold();
+			
+			// 슬라임 정보 가져오기
+			monName = monster.getMonName();
+			monMaxHp = monster.getMonMaxHp();
+			monRealHp = monster.getMonRealHp();
+			monAd = monster.getMonAd();
+			monDf = monster.getMonDf();
+			giveXp = monster.getGiveXp();
+			giveGold = monster.getGiveGlod();
+				
+			String battle_messege;
+				
+			while(monRealHp > 0)
+			{
+				System.out.println("공격하기(a)\n상태확인(i)\n도망가기(r)");
+				battle_messege = scan.nextLine();
+				if(battle_messege.charAt(0) == 'a')
+				{
+					System.out.println("==========================");
+					System.out.println("전투 돌입!!");
+					System.out.println("==========================");
+						
+						// 데미지 계산 변수 num 초기화
+						int num = 0;
+						// 플레이어의 공격 턴
+						// 플레이어 공격력(1~max) 랜덤 - 몬스터 방어력 계산
+						num = random.nextInt(ad)+1 - monDf;
+						// 위 계산을 진행 후 0이하의 값이 나온다면!
+						if(num < 0) {
+							System.out.println("==========================");
+							System.out.println(monName+"에게 유효한 공격을 하지 못했습니다");
+							System.out.println("==========================");
+							// 몬스터의 공격 턴
+							if(monRealHp > 0) {
+								num = 0;
+								num = random.nextInt(monAd)+1 - df;
+								// 위 계산을 진행 후 0이하의 값이 나온다면!
+								if(num < 0) {
+									System.out.println("==========================");
+									System.out.println(monName+"은(는) 유효한 공격을 하지 못했습니다");
+									System.out.println("==========================");
+								}
+								else {
+									// 몬스터의 공격 계산
+									crrHp -= num;
+									
+									// playerStatus의 현재 체력 변수에 반영
+									pstatus.setCrrHp(crrHp);
+									
+									if(crrHp > 0) {
+										System.out.println("==========================");
+										System.out.println(monName+"으로부터 "+num+"의 데미지를 입었습니다\n남은 체력은 "+crrHp+"입니다");
+										System.out.println("==========================");
+									}
+									// 체력이 0이 될 경우 게임 종료
+									else
+									{
+										System.out.println("==========================");
+										System.out.println("남은 체력은 0입니다\n당신은 죽었습니다\n게임 종료");
+										System.out.println("==========================");
+										break;
+									}
+								}
+								
+							}
+						} // 위 계산을 진행 후 1이상의 값이 나온다면!
+						else {
+							monRealHp -= num;
+			
+							if(monRealHp > 0) {
+								System.out.println("==========================");
+								System.out.println(monName+"에게 "+num+"의 데미지를 입혔습니다\n"+ monName +"의 남은 체력은 "+monRealHp+"입니다");
+								System.out.println("==========================");
+								num = 0;
+								num = random.nextInt(monAd)+1 - df;
+								// 위 계산을 진행 후 0이하의 값이 나온다면!
+								if(num < 0) {
+									System.out.println("==========================");
+									System.out.println(monName+"은(는) 유효한 공격을 하지 못했습니다");
+										System.out.println("==========================");
+								}
+								else {
+									// 몬스터의 공격 계산
+									crrHp -= num;
+									
+									// playerStatus의 현재 체력 변수에 반영
+									pstatus.setCrrHp(crrHp);
+									
+									if(crrHp > 0) {
+										System.out.println("==========================");
+										System.out.println(monName+"으로부터 "+num+"의 데미지를 입었습니다\n남은 체력은 "+crrHp+"입니다");
+										System.out.println("==========================");
+									}
+									// 체력이 0이 될 경우 게임 종료
+									else
+									{
+										System.out.println("==========================");
+										System.out.println("남은 체력은 0입니다\n당신은 죽었습니다\n게임 종료");
+										System.out.println("==========================");
+										break;
+									}
+								}
+							}
+							else 
+							{
+								System.out.println("==========================");
+								System.out.println(monName+"에게 "+num+"의 데미지를 입혔습니다\n"+ monName +"의 남은 체력은 0입니다");
+								System.out.println("==========================");
+								System.out.println(monName+"과의 전투에서 승리하였습니다!!\n경험치"+ giveXp +"을 획득하였습니다\n골드"+ giveGold +"을 획득하였습니다");
+								System.out.println("==========================");
+								xp += giveXp;
+								gold += giveGold;
+								
+								// 획득한 경험치와 골드 playerStatus의 변수에 저장
+								pstatus.setXp(xp);
+								pstatus.setGold(gold);
+
+							}
+						}
+					}
+					if(battle_messege.charAt(0) == 'i')
+						{
+							pstatus.playerStatus();
+						}
+						if(battle_messege.charAt(0) == 'r')
+						{
+							return;
+						}
+					
+			}
 				
 		}
 	
 		if(playerDoit.charAt(0) == '2')
 		{
 			monster.BuildMonster(2);
-			bom.Bettle();
+		//	bom.Bettle();
 		}
 		// 3 입력 시
 		if(playerDoit.charAt(0) == '3')
 		{
 			monster.BuildMonster(3);
-			bom.Bettle();
+		//	bom.Bettle();
 		}
 		// b 입력 시
 		if(playerDoit.charAt(0) == '4')
@@ -84,7 +231,7 @@ public class Main {
 	public static void main(String[] args)
 	{
 		BuildClass buildclass = new BuildClass();
-		PlayerStatus pstatus = new PlayerStatus();
+		// PlayerStatus pstatus = new PlayerStatus();
 		
 		
 		// 게임 시작
