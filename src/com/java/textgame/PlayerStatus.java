@@ -95,7 +95,7 @@ class PlayerStatus {
 		System.out.println(playerName+"\n-------\n"+playerClass
 				+"\n레벨 : "+level+"\n경험치 : "+xp+"\n최대 체력 : "+maxHp
 				+"\n현재 체력 : "+crrHp+"\n공격력 : "+ad+"\n방어력 : "+df
-				+"\n보유 골드 : "+gold);
+				+"\n보유 골드 : "+gold + "\n-------");
 		
 	}
 	
