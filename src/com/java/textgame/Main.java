@@ -1,5 +1,7 @@
 package com.java.textgame;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -26,12 +28,90 @@ public class Main {
 	public static int giveXp;
 	public static int giveGold;
 	
+	//아이템 저장 인벤토리 변수 선언
+	static ArrayList<String> inventory = new ArrayList<String>();
+	static Iterator<String> iterator = inventory.iterator();
+	
 	public static String yn;
 	
 	static Scanner scan = new Scanner(System.in);
 	static Random random = new Random();
 	static PlayerStatus pstatus = new PlayerStatus();
 	
+	// 상점 페이즈
+	private static void store() {
+		System.out.println();
+		System.out.println("구매할 아이템을 선택해주세요\n-------");
+		System.out.println("하급 포션(20 골드)(1)");
+		System.out.println("중급 포션(30 골드)(2)");
+		System.out.println("상급 포션(50 골드)(3)");
+		System.out.println("뒤로 가기(4)");
+		
+		gold = pstatus.getGold();
+		
+		playerDoit = scan.nextLine();
+		
+		while(playerDoit.charAt(0) != '1' && playerDoit.charAt(0) != '2' &&
+				playerDoit.charAt(0) != '3' && playerDoit.charAt(0) != '4')
+		{
+			System.out.println();
+			System.out.println("구매할 아이템을 선택해주세요\n-------");
+			System.out.println("하급 포션(20 골드)(1)");
+			System.out.println("중급 포션(30 골드)(2)");
+			System.out.println("상급 포션(50 골드)(3)");
+			System.out.println("뒤로 가기(4)");
+				
+			playerDoit = scan.nextLine();
+		}
+		
+		// 1 입력 시
+		if(playerDoit.charAt(0) == '1') {
+			if(gold >= 20) {
+				gold = gold - 20;
+				System.out.println("하급 포션 하나를 구매하셨습니다.");
+				
+				inventory.add("lowPotion");
+				pstatus.setGold(gold);
+			}else {
+				System.out.println("골드가 부족하여 구매할 수 없습니다.");
+			}
+		}
+		
+		// 2 입력 시
+		if(playerDoit.charAt(0) == '2') {
+			if(gold >= 30) {
+				gold = gold - 30;
+				System.out.println("중급 포션 하나를 구매하셨습니다.");
+				
+				inventory.add("midPotion");
+				pstatus.setGold(gold);
+			}else {
+				System.out.println("골드가 부족하여 구매할 수 없습니다.");
+			}
+		}
+		
+		// 3 입력 시
+		if(playerDoit.charAt(0) == '3') {
+			if(gold >= 50) {
+				gold = gold - 50;
+				System.out.println("상급 포션 하나를 구매하셨습니다.");
+				
+				inventory.add("advPotion");
+				pstatus.setGold(gold);
+			}else {
+				System.out.println("골드가 부족하여 구매할 수 없습니다.");
+			}
+		}
+		
+		// 4 입력 시
+		if(playerDoit.charAt(0) == '4') {
+			pstatus.setGold(gold);
+			return;
+		}
+		
+	}
+	
+	// 던전 페이즈
 	private static void fight() {
 		
 		BuildMonster monster = new BuildMonster();
@@ -117,7 +197,7 @@ public class Main {
 				
 		while(monRealHp > 0)
 		{
-			System.out.println("공격하기(a)\n상태확인(i)\n도망가기(r)");
+			System.out.println("공격하기(a)\n아이템(i)\n상태확인(s)\n도망가기(r)");
 			battle_messege = scan.nextLine();
 			if(battle_messege.charAt(0) == 'a')
 			{
@@ -227,6 +307,19 @@ public class Main {
 			}
 			if(battle_messege.charAt(0) == 'i')
 			{
+				// 아이템 리스트 보여주기
+				System.out.println();
+				if(iterator.hasNext() == false) {
+					System.out.println("가방에 아이템이 존재하지 않습니다.");
+				}else {
+					while (iterator.hasNext()) {
+						System.out.println("아이템 리스트\n------");
+		            	System.out.println(iterator.next());
+		        	}
+				}
+			}
+			if(battle_messege.charAt(0) == 's')
+			{
 				pstatus.playerStatus();
 				System.out.println();
 				System.out.println("몬스터 정보\n-------");
@@ -299,6 +392,9 @@ public class Main {
 		        pstatus.setGold(0);
 		        
 		        pstatus.playerStatus();
+		        
+		        // 상점 테스트 코드
+		        pstatus.setGold(500);
 			}
 			if(playerClass.charAt(0) == 'a' || playerClass.charAt(0) == 'A') {
 				//궁수 직업 값 입력 받기
@@ -341,7 +437,8 @@ public class Main {
 			System.out.println("무엇을 할까요?\n-------");
 			System.out.println("던전 진입(d)");
 			System.out.println("내 정보 확인(s)");
-			System.out.println("내 장비 확인(i)");
+			System.out.println("내 가방 확인(i)");
+			System.out.println("내 장비 확인(e)");
 			System.out.println("상점 출입(m)");
 			System.out.println("게임 종료(e)");
 			playerDoit = scan.nextLine();
@@ -354,9 +451,10 @@ public class Main {
 				System.out.println("무엇을 할까요?\n-------");
 				System.out.println("던전 진입(d)");
 				System.out.println("내 정보 확인(s)");
-				System.out.println("내 장비 확인(i)");
+				System.out.println("내 가방 확인(i)");
+				System.out.println("내 장비 확인(e)");
 				System.out.println("상점 출입(m)");
-				System.out.println("게임 종료(e)");
+				System.out.println("게임 종료(end)");
 				playerDoit = scan.nextLine();
 			}
 			
@@ -379,22 +477,33 @@ public class Main {
 				pstatus.playerStatus();
 			}
 			
-			// 내 장비 확인(i)
+			// 내 가방 확인(i)
 			if(playerDoit.charAt(0) == 'i' || playerDoit.charAt(0) == 'I') {
+				// 아이템 리스트 보여주기
+				// 이부분 수정해야함!!
 				System.out.println();
-				System.out.println("-------");
-				System.out.println("준 비 중\n-------");
+				if(iterator.hasNext() == false) {
+					System.out.println("가방에 아이템이 존재하지 않습니다.");
+				}else {
+					System.out.println("아이템 리스트\n------");
+					while (iterator.hasNext()) {
+		            	System.out.println(iterator.next());
+		        	}
+				}
+			}
+						
+			// 내 장비 확인(e)
+			if(playerDoit.charAt(0) == 'e' || playerDoit.charAt(0) == 'E') {
+				
 			}
 			
 			// 상점 출입(m)
 			if(playerDoit.charAt(0) == 'm' || playerDoit.charAt(0) == 'M') {
-				System.out.println();
-				System.out.println("-------");
-				System.out.println("준 비 중\n-------");
+				store();
 			}
 			
-			// 게임 종료(e)
-			if(playerDoit.charAt(0) == 'e' || playerDoit.charAt(0) == 'E') {
+			// 게임 종료(end)
+			if(playerDoit.equals("end")) {
 					System.out.println();
 					System.out.println("-------");
 					System.out.println("게 임 종 료\n-------");
